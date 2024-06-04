@@ -12,10 +12,12 @@ const ATTACHMENTS: &str = "attachments";
 #[command(version, about = "Divera Status Tracker", long_about = None)]
 #[clap(propagate_version = true)]
 enum Cli {
-    /// Fetch all attachments and aggregate them
+    /// Fetch all attachments
     Fetch(Fetch),
     /// Aggregate attachments
     Aggregate(Aggregate),
+    /// Fetch all attachments and aggregate them
+    Update(Update),
     /// Create on-duty table
     OnDuty(OnDuty),
 }
@@ -30,12 +32,24 @@ struct Fetch {
     pub password: String,
     #[clap(long)]
     pub subject: String,
+}
+
+#[derive(Debug, Parser)]
+struct Aggregate {
     #[clap(long)]
     pub off_duty_keyword: String,
 }
 
 #[derive(Debug, Parser)]
-struct Aggregate {
+struct Update {
+    #[clap(long)]
+    pub email: String,
+    #[clap(long)]
+    pub host: String,
+    #[clap(long)]
+    pub password: String,
+    #[clap(long)]
+    pub subject: String,
     #[clap(long)]
     pub off_duty_keyword: String,
 }
@@ -58,6 +72,15 @@ fn main() {
 
     match cli {
         Cli::Fetch(cmd) => {
+            fetcher::fetch_subject_messages(
+                cmd.host,
+                cmd.email,
+                cmd.password,
+                cmd.subject,
+                &attachments_path,
+            );
+        }
+        Cli::Update(cmd) => {
             fetcher::fetch_subject_messages(
                 cmd.host,
                 cmd.email,
