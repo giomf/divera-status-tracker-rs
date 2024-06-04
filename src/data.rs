@@ -8,7 +8,7 @@ use polars::prelude::*;
 const NAME_COLUMN_NAME: &str = "Name";
 const TOTAL_ON_DUTY_COLUMN_NAME: &str = "Total On-Duty";
 const WEEKEND_ON_DUTY_COLUMN_NAME: &str = "Weekend On-Duty";
-const OFF_DUTY_WITH_NOTE_COLUMN_NAME: &str = "Off-Duty without Note";
+const OFF_DUTY_WITH_NOTE_COLUMN_NAME: &str = "Off-Duty with Note";
 
 lazy_static::lazy_static! {
     static ref NAMES: Expr = col("*").exclude(["date"]);
