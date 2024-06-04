@@ -1,5 +1,5 @@
 [package]
-name = "ff-divera-status-tracker-rs"
+name = "dst"
 version = "0.1.0"
 edition = "2021"
 
@@ -15,6 +15,6 @@ glob = "0.3.1"
 imap = { git = "https://github.com/jonhoo/rust-imap", default-features = false, features = ["rustls-tls"] }
 lazy_static = "1.4.0"
 mailparse = "0.14.1"
-polars = { version = "0.38.3", features = ["lazy", "dtype-struct", "parquet"] }
+polars = { version = "0.38.3", features = ["lazy", "dtype-struct", "parquet", "dtype-date", "strings"] }
 # incomaptile with newer versions of polars
 polars_excel_writer = { git = "https://github.com/jmcnamara/polars_excel_writer" }

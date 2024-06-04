@@ -546,6 +546,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8566979429cf69b49a5c740c60791108e86440e8be149bbea4fe54d2c32d6e2"
 
 [[package]]
+name = "dst"
+version = "0.1.0"
+dependencies = [
+ "calamine",
+ "chrono",
+ "clap",
+ "either",
+ "glob",
+ "imap",
+ "lazy_static",
+ "mailparse",
+ "polars",
+ "polars_excel_writer",
+]
+
+[[package]]
 name = "dyn-clone"
 version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -601,22 +617,6 @@ name = "fast-float"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "95765f67b4b18863968b4a1bd5bb576f732b29a4a28c7cd84c09fa3e2875f33c"
-
-[[package]]
-name = "ff-divera-status-tracker-rs"
-version = "0.1.0"
-dependencies = [
- "calamine",
- "chrono",
- "clap",
- "either",
- "glob",
- "imap",
- "lazy_static",
- "mailparse",
- "polars",
- "polars_excel_writer",
-]
 
 [[package]]
 name = "flate2"

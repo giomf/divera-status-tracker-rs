@@ -7,7 +7,7 @@ use polars_excel_writer::PolarsXlsxWriter;
 
 const ROW_OFFSET: u32 = 3;
 const COLUMN_OFFSET: u32 = 3;
-const DATE_TIME_OUTPUT_FORMAT: &str = "%Y-%m-%dT%H-%M-%S";
+const DATE_TIME_OUTPUT_FORMAT: &str = "%Y-%m-%dT%H:%M:%S";
 const DATE_TIME_INPUT_FORMAT: &str = "%d.%m.%Y %H:%M";
 
 pub fn write_parquet(mut df: DataFrame, file: &Path) {
