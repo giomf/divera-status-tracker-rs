@@ -34,7 +34,7 @@ pub fn aggregate_attachments(attachments_path: &Path, off_duty_keyword: &str) ->
                 df.clone().lazy(),
                 [col("name")],
                 [col("name")],
-                JoinArgs::new(JoinType::Left),
+                JoinArgs::new(JoinType::Outer { coalesce: true }),
             )
             .collect()
             .unwrap()
