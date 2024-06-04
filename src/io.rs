@@ -50,10 +50,7 @@ pub fn read_excel(file: &Path, off_duty_keyword: &str) -> DataFrame {
         .format(DATE_TIME_OUTPUT_FORMAT)
         .to_string();
 
-    let sheet = sheet.range(
-        (ROW_OFFSET, 0),
-        (sheet.height() as u32 - ROW_OFFSET, COLUMN_OFFSET),
-    );
+    let sheet = sheet.range((ROW_OFFSET, 0), (sheet.height() as u32 - 1, COLUMN_OFFSET));
 
     create_dataframe_from_sheet(&sheet, off_duty_keyword, &date)
 }

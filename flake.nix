@@ -15,6 +15,7 @@
           buildInputs = with pkgs; [ cargo rustc rust-analyzer rustfmt ];
           env = {
             POLARS_FMT_MAX_ROWS = 50;
+            # POLARS_FMT_MAX_COLS = 50;
           };
         };
       });
