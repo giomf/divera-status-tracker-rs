@@ -3,6 +3,7 @@ use std::{fs, path::Path};
 use calamine::{open_workbook, Data, DataType, Range, Reader, Xlsx};
 use chrono::NaiveDateTime;
 use polars::prelude::*;
+use polars_excel_writer::PolarsXlsxWriter;
 
 const ROW_OFFSET: u32 = 3;
 const COLUMN_OFFSET: u32 = 3;
@@ -22,6 +23,14 @@ pub fn read_parquet(path: &Path) -> DataFrame {
     ParquetReader::new(&mut file)
         .finish()
         .expect("Failed to read parquet file")
+}
+
+pub fn write_excel(file: &Path, df: &DataFrame) {
+    let mut xlsx_writer = PolarsXlsxWriter::new();
+    xlsx_writer.set_float_precision(2);
+    xlsx_writer.set_autofit(true);
+    xlsx_writer.write_dataframe(df).unwrap();
+    xlsx_writer.save(&file).unwrap();
 }
 
 pub fn read_excel(file: &Path, off_duty_keyword: &str) -> DataFrame {

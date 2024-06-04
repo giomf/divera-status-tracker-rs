@@ -56,12 +56,7 @@ pub fn calculate(df: DataFrame) -> DataFrame {
         .collect()
         .unwrap();
 
-    result
-        .sort(
-            ["on-duty"],
-            SortMultipleOptions::default().with_order_descending(true),
-        )
-        .unwrap()
+    result.sort(["on-duty"], true, true).unwrap()
 }
 
 fn calculate_on_duty(df: &DataFrame) -> DataFrame {

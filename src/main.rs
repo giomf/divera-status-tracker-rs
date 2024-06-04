@@ -44,6 +44,9 @@ struct Aggregate {
 struct OnDuty {
     #[clap(long)]
     pub print: bool,
+
+    #[clap(long)]
+    pub export: bool,
 }
 
 fn main() {
@@ -77,6 +80,14 @@ fn main() {
             let on_duty = data::calculate(aggregation_data);
             if cmd.print {
                 println!("{on_duty}");
+            }
+            if cmd.export {
+                let export = output_folder.join("on-duty.xlsx");
+                io::write_excel(&export, &on_duty);
+                println!(
+                    "on-duty exported to {}",
+                    export.to_string_lossy().to_string()
+                )
             }
         }
     };
