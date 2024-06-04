@@ -41,13 +41,17 @@ struct Aggregate {
 }
 
 #[derive(Debug, Parser)]
-struct OnDuty {}
+struct OnDuty {
+    #[clap(long)]
+    pub print: bool,
+}
 
 fn main() {
     let cli = Cli::parse();
     let output_folder = Path::new(OUTPUT);
-    let attachments_folder = output_folder.join(ATTACHMENTS);
-    fs::create_dir_all(&attachments_folder).expect("Failed to create attachments folder");
+    let attachments_path = output_folder.join(ATTACHMENTS);
+    let aggregation_path = output_folder.join("aggregation.parquet");
+    fs::create_dir_all(&attachments_path).expect("Failed to create attachments folder");
 
     match cli {
         Cli::Fetch(cmd) => {
@@ -56,16 +60,24 @@ fn main() {
                 cmd.email,
                 cmd.password,
                 cmd.subject,
-                &attachments_folder,
+                &attachments_path,
             );
-            let df = data::aggregate_attachments(&attachments_folder, &cmd.off_duty_keyword);
-            io::write_parquet(df, &output_folder);
+            let aggregation_data =
+                data::aggregate_attachments(&attachments_path, &cmd.off_duty_keyword);
+            io::write_parquet(aggregation_data, &aggregation_path);
         }
         Cli::Aggregate(cmd) => {
-            let df = data::aggregate_attachments(&attachments_folder, &cmd.off_duty_keyword);
-            io::write_parquet(df, &output_folder);
+            let aggregation_data =
+                data::aggregate_attachments(&attachments_path, &cmd.off_duty_keyword);
+            io::write_parquet(aggregation_data, &aggregation_path);
         }
 
-        Cli::OnDuty(_) => {}
+        Cli::OnDuty(cmd) => {
+            let aggregation_data = io::read_parquet(&aggregation_path);
+            let on_duty = data::calculate(aggregation_data);
+            if cmd.print {
+                println!("{on_duty}");
+            }
+        }
     };
 }

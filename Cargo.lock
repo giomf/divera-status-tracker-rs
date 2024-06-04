@@ -616,6 +616,7 @@ dependencies = [
  "either",
  "glob",
  "imap",
+ "lazy_static",
  "mailparse",
  "polars",
 ]

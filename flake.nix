@@ -13,6 +13,9 @@
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [ cargo rustc rust-analyzer rustfmt ];
+          env = {
+            POLARS_FMT_MAX_ROWS = 50;
+          };
         };
       });
 }

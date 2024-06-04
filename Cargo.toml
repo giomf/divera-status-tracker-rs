@@ -12,5 +12,6 @@ clap = { version = "4.5.4", features = ["derive", "cargo"] }
 either = "1.11.0"
 glob = "0.3.1"
 imap = { git = "https://github.com/jonhoo/rust-imap", default-features = false, features = ["rustls-tls"] }
+lazy_static = "1.4.0"
 mailparse = "0.14.1"
 polars = { version = "0.39.2", features = ["lazy", "dtype-struct", "parquet"] }

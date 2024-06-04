@@ -1,4 +1,4 @@
-use std::{fs, future::Ready, path::Path};
+use std::{fs, path::Path};
 
 use calamine::{open_workbook, Data, DataType, Range, Reader, Xlsx};
 use chrono::NaiveDateTime;
@@ -9,13 +9,19 @@ const COLUMN_OFFSET: u32 = 3;
 const DATE_TIME_OUTPUT_FORMAT: &str = "%Y-%m-%dT%H-%M-%S";
 const DATE_TIME_INPUT_FORMAT: &str = "%d.%m.%Y %H:%M";
 
-pub fn write_parquet(mut df: DataFrame, output_path: &Path) {
-    let file = output_path.join("aggregation.parquet");
+pub fn write_parquet(mut df: DataFrame, file: &Path) {
     let mut file = fs::File::create(file).expect("Failed to create file");
 
     ParquetWriter::new(&mut file)
         .finish(&mut df)
         .expect("Failed to write to aggragation file");
+}
+
+pub fn read_parquet(path: &Path) -> DataFrame {
+    let mut file = std::fs::File::open(path).expect("Failed to open file");
+    ParquetReader::new(&mut file)
+        .finish()
+        .expect("Failed to read parquet file")
 }
 
 pub fn read_excel(file: &Path, off_duty_keyword: &str) -> DataFrame {
