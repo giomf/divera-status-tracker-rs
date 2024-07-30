@@ -18,3 +18,7 @@ mailparse = "0.14.1"
 polars = { version = "0.38.3", features = ["lazy", "dtype-struct", "parquet", "dtype-date", "strings"] }
 # incomaptile with newer versions of polars
 polars_excel_writer = { git = "https://github.com/jmcnamara/polars_excel_writer" }
+
+[build-dependencies]
+clap = { version = "4.5.4", features = ["derive", "cargo"] }
+clap-markdown = "0.1.4"

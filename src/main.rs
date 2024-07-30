@@ -1,4 +1,7 @@
+mod cli;
+
 use clap::Parser;
+use cli::Cli;
 use std::{fs, path::Path};
 
 mod data;
@@ -7,61 +10,6 @@ mod io;
 
 const OUTPUT: &str = "output";
 const ATTACHMENTS: &str = "attachments";
-
-#[derive(Parser)]
-#[command(version, about = "Divera Status Tracker", long_about = None)]
-#[clap(propagate_version = true)]
-enum Cli {
-    /// Fetch all attachments
-    Fetch(Fetch),
-    /// Aggregate attachments
-    Aggregate(Aggregate),
-    /// Fetch all attachments and aggregate them
-    Update(Update),
-    /// Create on-duty table
-    OnDuty(OnDuty),
-}
-
-#[derive(Debug, Parser)]
-struct Fetch {
-    #[clap(long)]
-    pub email: String,
-    #[clap(long)]
-    pub host: String,
-    #[clap(long)]
-    pub password: String,
-    #[clap(long)]
-    pub subject: String,
-}
-
-#[derive(Debug, Parser)]
-struct Aggregate {
-    #[clap(long)]
-    pub off_duty_keyword: String,
-}
-
-#[derive(Debug, Parser)]
-struct Update {
-    #[clap(long)]
-    pub email: String,
-    #[clap(long)]
-    pub host: String,
-    #[clap(long)]
-    pub password: String,
-    #[clap(long)]
-    pub subject: String,
-    #[clap(long)]
-    pub off_duty_keyword: String,
-}
-
-#[derive(Debug, Parser)]
-struct OnDuty {
-    #[clap(long)]
-    pub print: bool,
-
-    #[clap(long)]
-    pub export: bool,
-}
 
 fn main() {
     let cli = Cli::parse();
