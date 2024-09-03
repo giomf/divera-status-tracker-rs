@@ -1,14 +1,16 @@
-use std::{fs, path::Path};
-
+use crate::data::{DATE_COLUMN_NAME, TOTAL_ON_DUTY_COLUMN_NAME};
 use calamine::{open_workbook, Data, DataType, Range, Reader, Xlsx};
 use chrono::NaiveDateTime;
+use plotlars::{LineType, Plot, Text, TimeSeriesPlot};
 use polars::prelude::*;
 use polars_excel_writer::PolarsXlsxWriter;
+use std::{fs, path::Path};
 
 const ROW_OFFSET: u32 = 3;
 const COLUMN_OFFSET: u32 = 3;
 const DATE_TIME_OUTPUT_FORMAT: &str = "%Y-%m-%dT%H:%M:%S";
 const DATE_TIME_INPUT_FORMAT: &str = "%d.%m.%Y %H:%M";
+const HISTORY_TITLE: &str = "Total on duty over time";
 
 pub fn write_parquet(mut df: DataFrame, file: &Path) {
     let mut file = fs::File::create(file).expect("Failed to create file");
@@ -19,7 +21,7 @@ pub fn write_parquet(mut df: DataFrame, file: &Path) {
 }
 
 pub fn read_parquet(path: &Path) -> DataFrame {
-    let mut file = std::fs::File::open(path).expect("Failed to open file");
+    let mut file = std::fs::File::open(path).expect("Failed to open parquet file");
     ParquetReader::new(&mut file)
         .finish()
         .expect("Failed to read parquet file")
@@ -61,7 +63,7 @@ fn create_dataframe_from_sheet(
     date: &str,
 ) -> DataFrame {
     let columns = transpose(&sheet);
-    let state = StructChunked::new(
+    let state = StructChunked::from_series(
         "state",
         &[
             Series::new(
@@ -98,4 +100,17 @@ fn transpose(sheet: &Range<Data>) -> Vec<Vec<String>> {
                 .collect::<Vec<String>>()
         })
         .collect()
+}
+pub fn plot_history(history: DataFrame, file: &Path) {
+    TimeSeriesPlot::builder()
+        .data(&history)
+        .x(DATE_COLUMN_NAME)
+        .y(TOTAL_ON_DUTY_COLUMN_NAME)
+        .additional_series(vec!["Minimum"])
+        .line_types(vec![LineType::Solid, LineType::Dot])
+        .plot_title(Text::from(HISTORY_TITLE))
+        .x_title(Text::from(DATE_COLUMN_NAME))
+        .y_title(Text::from(TOTAL_ON_DUTY_COLUMN_NAME))
+        .build()
+        .write_html(file.to_string_lossy());
 }

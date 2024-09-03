@@ -1,17 +1,21 @@
 use std::path::Path;
 
 use crate::io;
+use chrono::NaiveDate;
 use either::Either;
 use glob::glob;
+use polars::lazy::prelude::*;
 use polars::prelude::*;
 
 const NAME_COLUMN_NAME: &str = "Name";
-const TOTAL_ON_DUTY_COLUMN_NAME: &str = "Total On-Duty";
+pub const DATE_COLUMN_NAME: &str = "Date";
+pub const TOTAL_ON_DUTY_COLUMN_NAME: &str = "Total On-Duty";
 const WEEKEND_ON_DUTY_COLUMN_NAME: &str = "Weekend On-Duty";
 const OFF_DUTY_WITH_NOTE_COLUMN_NAME: &str = "Off-Duty with Note";
 
 lazy_static::lazy_static! {
-    static ref NAMES: Expr = col("*").exclude(["date"]);
+    static ref DATES: Expr = col(DATE_COLUMN_NAME);
+    static ref NAMES: Expr = col("*").exclude([DATE_COLUMN_NAME]);
     static ref STATE: Expr = NAMES.clone().struct_().field_by_name("state");
     static ref NOTE: Expr = NAMES.clone().struct_().field_by_name("note");
     static ref COUNT: Expr = NAMES.clone().count();
@@ -34,17 +38,20 @@ pub fn aggregate_attachments(attachments_path: &Path, off_duty_keyword: &str) ->
                 df.clone().lazy(),
                 [col("name")],
                 [col("name")],
-                JoinArgs::new(JoinType::Outer { coalesce: true }),
+                JoinArgs::new(JoinType::Full).with_coalesce(JoinCoalesce::CoalesceColumns),
             )
             .collect()
             .unwrap()
     })
     .unwrap()
-    .transpose(Some("date"), Some(Either::Left("name".to_string())))
+    .transpose(
+        Some(DATE_COLUMN_NAME),
+        Some(Either::Left("name".to_string())),
+    )
     .unwrap()
     .lazy()
     .select([
-        col("date")
+        DATES
             .clone()
             .str()
             .to_datetime(None, None, StrptimeOptions::default(), lit("raise")),
@@ -52,6 +59,40 @@ pub fn aggregate_attachments(attachments_path: &Path, off_duty_keyword: &str) ->
     ])
     .collect()
     .unwrap()
+}
+
+pub fn history(df: DataFrame, minimum: u32, year: Option<i32>, month: Option<u32>) -> DataFrame {
+    let history = df.clone().lazy();
+
+    let history = if let (Some(year), Some(month)) = (year, month) {
+        let (to_year, to_month) = if month == 12 {
+            (year + 1, 1)
+        } else {
+            (year, month + 1)
+        };
+
+        let from_date = NaiveDate::from_ymd_opt(year, month, 1).expect("Unable to create date");
+        let to_date = NaiveDate::from_ymd_opt(to_year, to_month, 1).expect("Unable to create date");
+        history.filter(
+            DATES
+                .clone()
+                .gt(lit(from_date))
+                .and(DATES.clone().lt(lit(to_date))),
+        )
+    } else {
+        history
+    };
+
+    history
+        .select([
+            DATES.clone(),
+            sum_horizontal([STATE.clone()])
+                .unwrap()
+                .alias(TOTAL_ON_DUTY_COLUMN_NAME),
+        ])
+        .with_column(lit(minimum).alias("Minimum"))
+        .collect()
+        .unwrap()
 }
 
 pub fn calculate(df: DataFrame) -> DataFrame {
@@ -79,8 +120,12 @@ pub fn calculate(df: DataFrame) -> DataFrame {
 
     let result = result.rename("name", NAME_COLUMN_NAME).unwrap().clone();
 
+    let sort_options = SortMultipleOptions::new()
+        .with_multithreaded(true)
+        .with_order_descending(true);
+
     result
-        .sort([TOTAL_ON_DUTY_COLUMN_NAME], true, true)
+        .sort([TOTAL_ON_DUTY_COLUMN_NAME], sort_options)
         .unwrap()
 }
 

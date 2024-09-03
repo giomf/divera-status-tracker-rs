@@ -1,15 +1,16 @@
-mod cli;
-
 use clap::Parser;
 use cli::Cli;
 use std::{fs, path::Path};
 
+mod cli;
 mod data;
 mod fetcher;
 mod io;
 
 const OUTPUT: &str = "output";
 const ATTACHMENTS: &str = "attachments";
+const ON_DUTY_NAME: &str = "on-duty.xlxs";
+const HISTORY_NAME: &str = "history.html";
 
 fn main() {
     let cli = Cli::parse();
@@ -48,16 +49,35 @@ fn main() {
 
         Cli::OnDuty(cmd) => {
             let aggregation_data = io::read_parquet(&aggregation_path);
+            dbg!(&aggregation_data);
             let on_duty = data::calculate(aggregation_data);
             if cmd.print {
                 println!("{on_duty}");
             }
             if cmd.export {
-                let export = output_folder.join("on-duty.xlsx");
-                io::write_excel(&export, &on_duty);
+                let export_path = output_folder.join(ON_DUTY_NAME);
+                io::write_excel(&export_path, &on_duty);
                 println!(
-                    "on-duty exported to {}",
-                    export.to_string_lossy().to_string()
+                    "On-duty exported to {}",
+                    export_path.to_string_lossy().to_string()
+                )
+            }
+        }
+
+        Cli::History(cmd) => {
+            let aggregation_data = io::read_parquet(&aggregation_path);
+            let history = data::history(aggregation_data, 12, cmd.year, cmd.month);
+
+            if cmd.print {
+                println!("{history}");
+            }
+
+            if cmd.export {
+                let export_path = output_folder.join(HISTORY_NAME);
+                io::plot_history(history, &export_path);
+                println!(
+                    "History exported to {}",
+                    export_path.to_string_lossy().to_string()
                 )
             }
         }

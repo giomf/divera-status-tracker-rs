@@ -9,6 +9,7 @@ This document contains the help content for the `dst` command-line program.
 * [`dst aggregate`↴](#dst-aggregate)
 * [`dst update`↴](#dst-update)
 * [`dst on-duty`↴](#dst-on-duty)
+* [`dst history`↴](#dst-history)
 
 ## `dst`
 
@@ -22,6 +23,7 @@ Divera Status Tracker (dst)
 * `aggregate` — Aggregate attachments
 * `update` — Fetch all attachments and aggregate them
 * `on-duty` — Create on-duty table
+* `history` — Create history plot
 
 
 
@@ -78,6 +80,21 @@ Create on-duty table
 
 * `--print` — Print the overview
 * `--export` — Export the overview as xlsx
+
+
+
+## `dst history`
+
+Create history plot
+
+**Usage:** `dst history [OPTIONS]`
+
+###### **Options:**
+
+* `--print` — Print the overview
+* `--export` — Export the overview as html
+* `--year <YEAR>` — The year
+* `--month <MONTH>` — The month
 
 
 

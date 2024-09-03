@@ -12,6 +12,8 @@ pub enum Cli {
     Update(Update),
     /// Create on-duty table
     OnDuty(OnDuty),
+    /// Create history plot
+    History(History),
 }
 
 #[derive(Debug, Parser)]
@@ -72,4 +74,23 @@ pub struct OnDuty {
     /// Export the overview as xlsx
     #[clap(long)]
     pub export: bool,
+}
+
+#[derive(Debug, Parser)]
+pub struct History {
+    /// Print the overview
+    #[clap(long)]
+    pub print: bool,
+
+    /// Export the overview as html
+    #[clap(long)]
+    pub export: bool,
+
+    /// The year
+    #[clap(long, requires = "month")]
+    pub year: Option<i32>,
+
+    /// The month
+    #[clap(long, requires = "year")]
+    pub month: Option<u32>,
 }

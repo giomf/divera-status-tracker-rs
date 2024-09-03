@@ -3,3 +3,4 @@ output/
 *.xlsx
 .direnv/
 .envrc
+*.html
